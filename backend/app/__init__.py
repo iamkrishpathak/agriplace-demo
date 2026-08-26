@@ -1,0 +1,2 @@
+"""AgriPlace FastAPI application package."""
+

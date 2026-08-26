@@ -1,0 +1,15 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.env
+agriplace.db
+frontend/.next/
+frontend/node_modules/
+frontend/.env.local
+frontend/out/
+tmp/
+uploads/
+

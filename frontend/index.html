@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#176b42" />
+    <title>AgriPlace | Direct farm trade</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Noto+Sans+Devanagari:wght@500;600;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="styles.css?v=20260826a" />
+  </head>
+  <body>
+    <div class="app-shell">
+      <header class="topbar">
+        <a class="brand" href="#dashboard" aria-label="AgriPlace home">
+          <span class="brand-mark" aria-hidden="true"><i></i><i></i><i></i></span>
+          <span>AgriPlace</span>
+        </a>
+        <div class="topbar-actions">
+          <span class="connection" id="connectionStatus"><b></b>Checking API</span>
+          <button class="icon-button" id="apiSettings" type="button" aria-label="Change API address" title="Change API address">API</button>
+          <button class="avatar-button" id="userMenu" type="button" aria-label="Account menu" title="Account menu">RP</button>
+        </div>
+      </header>
+
+      <div class="workspace">
+        <aside class="sidebar">
+          <nav class="role-nav" aria-label="Role workspace">
+            <button class="role-tab active" data-role="farmer" type="button"><span class="role-icon">F</span><span>Farmer</span></button>
+            <button class="role-tab" data-role="buyer" type="button"><span class="role-icon">B</span><span>Buyer</span></button>
+            <button class="role-tab" data-role="transporter" type="button"><span class="role-icon">T</span><span>Transporter</span></button>
+            <button class="role-tab" data-role="admin" type="button"><span class="role-icon">A</span><span>Admin</span></button>
+          </nav>
+          <div class="sidebar-bottom">
+            <button id="refreshData" class="quiet-button" type="button">Refresh data</button>
+            <p>Prototype data is clearly marked in every workflow.</p>
+          </div>
+        </aside>
+
+        <main id="app" class="content" aria-live="polite">
+          <section class="loading-screen">
+            <div class="loading-mark"><span></span><span></span><span></span></div>
+            <p>Loading farm trade workspace</p>
+          </section>
+        </main>
+      </div>
+    </div>
+
+    <dialog id="apiDialog" class="dialog">
+      <form method="dialog" id="apiForm">
+        <div class="dialog-heading"><h2>API connection</h2><button class="icon-button close-button" value="cancel" aria-label="Close">x</button></div>
+        <label>API address<input id="apiBaseInput" type="url" required /></label>
+        <div class="dialog-actions"><button class="secondary-button" value="cancel">Cancel</button><button class="primary-button" value="default">Save</button></div>
+      </form>
+    </dialog>
+
+    <div id="toastRegion" class="toast-region" aria-live="polite"></div>
+    <script src="app.js?v=20260826a"></script>
+  </body>
+</html>
