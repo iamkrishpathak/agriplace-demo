@@ -1,0 +1,145 @@
+version: '3.8'
+
+services:
+  postgres:
+    image: postgres:15-alpine
+    container_name: agriplace_postgres
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: password
+      POSTGRES_DB: agriplace
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres_data:/var/lib/postgresql/data
+      - ./postgres_init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: redis:7-alpine
+    container_name: agriplace_redis
+    ports:
+      - "6379:6379"
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
+
+  api-gateway:
+    build: ./services/api-gateway
+    container_name: agriplace_api_gateway
+    ports:
+      - "8000:8000"
+    depends_on:
+      - auth-service
+      - user-service
+      - marketplace-service
+      - order-service
+      - logistics-service
+      - payment-service
+      - notification-service
+      - ml-service
+    environment:
+      - AUTH_SERVICE_URL=http://auth-service:8000
+      - USER_SERVICE_URL=http://user-service:8000
+      - MARKETPLACE_SERVICE_URL=http://marketplace-service:8000
+      - ORDER_SERVICE_URL=http://order-service:8000
+      - LOGISTICS_SERVICE_URL=http://logistics-service:8000
+      - PAYMENT_SERVICE_URL=http://payment-service:8000
+      - NOTIFICATION_SERVICE_URL=http://notification-service:8000
+      - ML_SERVICE_URL=http://ml-service:8000
+
+  auth-service:
+    build: ./services/auth-service
+    container_name: agriplace_auth_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/auth_db
+      - REDIS_URL=redis://redis:6379/0
+      - JWT_SECRET_KEY=supersecretkey_change_in_production
+      - JWT_ALGORITHM=HS256
+      - ACCESS_TOKEN_EXPIRE_MINUTES=30
+      - REFRESH_TOKEN_EXPIRE_DAYS=7
+
+  user-service:
+    build: ./services/user-service
+    container_name: agriplace_user_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/user_db
+      - AUTH_SERVICE_URL=http://auth-service:8000
+
+  marketplace-service:
+    build: ./services/marketplace-service
+    container_name: agriplace_marketplace_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/marketplace_db
+      - USER_SERVICE_URL=http://user-service:8000
+
+  order-service:
+    build: ./services/order-service
+    container_name: agriplace_order_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/order_db
+      - MARKETPLACE_SERVICE_URL=http://marketplace-service:8000
+      - USER_SERVICE_URL=http://user-service:8000
+      - PAYMENT_SERVICE_URL=http://payment-service:8000
+      - LOGISTICS_SERVICE_URL=http://logistics-service:8000
+
+  logistics-service:
+    build: ./services/logistics-service
+    container_name: agriplace_logistics_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/logistics_db
+      - USER_SERVICE_URL=http://user-service:8000
+      - ML_SERVICE_URL=http://ml-service:8000
+
+  payment-service:
+    build: ./services/payment-service
+    container_name: agriplace_payment_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/payment_db
+
+  notification-service:
+    build: ./services/notification-service
+    container_name: agriplace_notification_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/notification_db
+
+  ml-service:
+    build: ./services/ml-service
+    container_name: agriplace_ml_service
+    depends_on:
+      postgres:
+        condition: service_healthy
+    environment:
+      - DATABASE_URL=postgresql://postgres:password@postgres:5432/ml_db
+
+volumes:
+  postgres_data:

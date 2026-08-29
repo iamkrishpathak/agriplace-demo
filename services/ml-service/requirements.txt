@@ -1,0 +1,16 @@
+fastapi
+uvicorn
+sqlalchemy
+psycopg2-binary
+alembic
+pydantic
+pydantic-settings
+python-jose[cryptography]
+python-multipart
+httpx
+pandas
+scikit-learn
+joblib
+ortools
+networkx
+email-validator
